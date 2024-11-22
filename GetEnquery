@@ -1,0 +1,94 @@
+<?php
+// Database connection details
+$servername = "localhost"; // Server name
+$username = "u126048445_connect2buyer"; // Your database username
+$password = "Rohitsha@2332"; // Your database password
+$dbname = "u126048445_connect2buyer"; // Database name
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Replace this with your desired vendor_id
+$vendor_id = 101; 
+
+// Prepare the SQL query
+$sql = "
+SELECT 
+    inquiries.id AS inquiry_id,
+    inquiries.vendor_id,
+    inquiries.products_id,
+    inquiries.name AS inquiry_name,
+    inquiries.number AS inquiry_number,
+    inquiries.created_at AS inquiry_date,
+    products.name AS product_name,
+    products.description AS product_description,
+    products.price AS product_price,
+    products.quantity AS product_quantity,
+    products.category_id AS product_category,
+    products.tags AS product_tags,
+    products.single_image AS product_image,
+    products.MOQ AS product_MOQ,
+    products.occasion AS product_occasion,
+    products.feature AS product_feature,
+    products.comfortable AS product_comfortable,
+    products.gender AS product_gender,
+    products.type AS product_type
+FROM 
+    inquiries
+INNER JOIN 
+    products
+ON 
+    inquiries.vendor_id = products.vendor_id
+WHERE 
+    inquiries.vendor_id = ?";
+
+// Prepare the statement
+$stmt = $conn->prepare($sql);
+
+// Bind the vendor_id parameter
+$stmt->bind_param("i", $vendor_id);
+
+// Execute the query
+$stmt->execute();
+
+// Get the result
+$result = $stmt->get_result();
+
+// Check if any records are found
+if ($result->num_rows > 0) {
+    // Fetch data as an associative array
+    while ($row = $result->fetch_assoc()) {
+        echo "Inquiry ID: " . $row['inquiry_id'] . "<br>";
+        echo "Vendor ID: " . $row['vendor_id'] . "<br>";
+        echo "Product ID: " . $row['products_id'] . "<br>";
+        echo "Inquiry Name: " . $row['inquiry_name'] . "<br>";
+        echo "Inquiry Number: " . $row['inquiry_number'] . "<br>";
+        echo "Inquiry Date: " . $row['inquiry_date'] . "<br>";
+        echo "Product Name: " . $row['product_name'] . "<br>";
+        echo "Product Description: " . $row['product_description'] . "<br>";
+        echo "Product Price: " . $row['product_price'] . "<br>";
+        echo "Product Quantity: " . $row['product_quantity'] . "<br>";
+        echo "Product Category: " . $row['product_category'] . "<br>";
+        echo "Product Tags: " . $row['product_tags'] . "<br>";
+        echo "Product Image: " . $row['product_image'] . "<br>";
+        echo "Product MOQ: " . $row['product_MOQ'] . "<br>";
+        echo "Product Occasion: " . $row['product_occasion'] . "<br>";
+        echo "Product Features: " . $row['product_feature'] . "<br>";
+        echo "Comfortable: " . $row['product_comfortable'] . "<br>";
+        echo "Gender: " . $row['product_gender'] . "<br>";
+        echo "Type: " . $row['product_type'] . "<br>";
+        echo "<hr>";
+    }
+} else {
+    echo "No records found for Vendor ID: $vendor_id";
+}
+
+// Close the statement and connection
+$stmt->close();
+$conn->close();
+?>
